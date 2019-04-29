@@ -1,0 +1,22 @@
+server {
+    underscores_in_headers on;
+    listen 80;
+    server_name  ec2-3-16-47-213.us-east-2.compute.amazonaws.com;
+
+    location ~ ^/(security|interaction) {
+        proxy_pass   http://processors.security.authentication;
+        #proxy_redirect https://uct-nginx.test.uniconnect.io https://uct-nginx.test.uniconnect.io;
+        proxy_redirect https://ec2-3-16-47-213.us-east-2.compute.amazonaws.com https://ec2-3-16-47-213.us-east-2.compute.amazonaws.com;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /customermgmt {
+        proxy_pass   http://processors.customermgmt.welcome:8080;
+
+    }
+
+    location /accountmgmt {
+        proxy_pass   http://processors.accountmgmt.retail:8080;
+
+    }
