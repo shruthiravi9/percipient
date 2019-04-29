@@ -1,0 +1,430 @@
+version: '3'
+networks:
+  docker_net:
+    driver: bridge
+services:
+  redis:
+    image: "redis"
+    container_name: ${tenant_name}-redis
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - uniLogger=${uniLogger_address}
+      - NODE_ENV=production
+      - DEBUG=*
+  processors.security.authentication:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/processors/security/authentication-${environment}"
+    container_name: processors.security.authentication
+    restart: unless-stopped
+    networks:
+      - docker_net
+    ports:
+      - "8080:80"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+        #- NODE_ENV=production
+        # - serverPort=80
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  processors.accountmgmt.retail:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/processors/accountmgmt/retail-${environment}"
+    container_name: processors.accountmgmt.retail
+    networks:
+      - docker_net
+    restart: unless-stopped
+     ports:
+      - "1026:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  processors.products:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/processors/products-${environment}"
+    container_name: processors.products
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "1027:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  processors.customermgmt.welcome:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/processors/customermgmt/welcome-${environment}"
+    container_name: "processors.customermgmt.welcome"
+    networks:
+      - docker_net
+    restart: unless-stopped
+     ports:
+      - "1025:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - uniLogger=${uniLogger_address}
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.finacle.welcome-profile:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/finacle/welcome-profile-${environment}"
+    container_name: "transformers.finacle.welcome-profile"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "100:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+       - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+
+                                                                                                                                                          81,9          20%
+ transformers.product-mgmt:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/product-mgmt-${environment}"
+    container_name: "transformers.product-mgmt"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "105:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.t24.welcome-profile:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/t24/welcome-profile-${environment}"
+    container_name: "transformers.t24.welcome-profile"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "91:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.finacle.account-list:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/finacle/account-list-${environment}"
+    container_name: "transformers.finacle.account-list"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.t24.account-list:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/t24/account-list-${environment}"
+    container_name: "transformers.t24.account-list"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "93:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.finacle.account-summary:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/finacle/account-summary-${environment}"
+    container_name: "transformers.finacle.account-summary"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "98:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+       - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.t24.account-summary:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/t24/account-summary-${environment}"
+    container_name: "transformers.t24.account-summary"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "92:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+       - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.finacle.transaction-list:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/finacle/transaction-list-${environment}"
+    container_name: "transformers.finacle.transaction-list"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "99:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.t24.transaction-list:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/t24/transaction-list-${environment}"
+    container_name: "transformers.t24.transaction-list"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "96:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+       - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.customer-mgmt:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/customer-mgmt-${environment}"
+    container_name: "transformers.customer-mgmt"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "107:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.account-mgmt:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/account-mgmt-${environment}"
+    container_name: "transformers.account-mgmt"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "106:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+       - DEBUG=*
+
+  connectors.finacle:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/connectors/finacle-${environment}"
+    container_name: "connectors.finacle"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "94:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - envValue=${environment}
+      - NODE_ENV=production
+      - dbname=${environment}-${tenant_name}
+      - tenant_name=${tenant_name}
+      - server_IP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  connectors.t24:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/t24-ofsml-connector-service-${environment}"
+    container_name: "connectors.t24"
+    networks:
+      - docker_net
+    restart: unless-stopped
+    ports:
+      - "97:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+      environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - redis=${ec2_public_address}
+      - NODE_ENV=production
+      - tenant_name=${tenant_name}
+      - server_IP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  transformers.cobe:
+    image: "261887539407.dkr.ecr.us-east-2.amazonaws.com/transformers/cobe-${environment}"
+    container_name: "transformers.cobe"
+    restart: unless-stopped
+    networks:
+      - docker_net
+    ports:
+      - "102:8080"
+    labels:
+      - com.uct.tenant=${tenant_name}
+      - com.uct.product=${environment}-${tenant_name}
+    environment:
+      - token=21f49399-e655-06cd-97a3-8033d5e20876
+      - uniLogger=${uniLogger_address}
+      - mongodb=mongodb://${mongo_address}:27018/${environment}-${tenant_name}-cobe
+      - NODE_ENV=production
+      - tenantName=${tenant_name}
+      - serverIP=http://${ec2_public_address}
+      - consul_uri=${consul_address}
+      - DEBUG=*
+  nginx:
+    image: "nginx"
+    container_name: "nginx"
+    restart: unless-stopped
+    networks:
+      - docker_net
+    ports:
+      - "80:80"
+    volumes:
+      - /opt/docker/nginx_conf:/etc/nginx
+    depends_on:
+      - transformers.cobe
+      - connectors.t24
+      - connectors.finacle
+      - transformers.t24.transaction-list
+      - transformers.finacle.transaction-list
+      - transformers.product-mgmt
+      - transformers.t24.account-summary
+      - transformers.finacle.account-summary
+      - transformers.t24.account-list
+      - transformers.finacle.account-list
+      - transformers.t24.welcome-profile
+      - transformers.finacle.welcome-profile
+      - processors.customermgmt.welcome
+      - processors.accountmgmt.retail
+      - processors.security.authentication
+      - processors.products
+
+
+                                                                                                         
+
+                                                                                                                                                          49,9          11%
